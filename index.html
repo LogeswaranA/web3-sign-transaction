@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Web3.js Personal Sign</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+</head>
+
+<body>
+    <h1>Web3.js Personal Sign</h1>
+
+    <button id="signButton">Sign Message</button>
+    <button id="verify">verify</button>
+
+
+    <script>
+        // Connect to MetaMask
+        async function connectToMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                window.web3 = new Web3(window.ethereum);
+                await window.ethereum.enable();
+                console.log('Connected to MetaMask');
+            } else {
+                console.log('MetaMask not detected');
+            }
+        }
+        const message = 'Hello, this is a signed message!';
+
+        // Sign a message using MetaMask's personal_sign
+        async function signMessage() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+
+                const signature = await web3.eth.personal.sign(message, accounts[0], '');
+
+                console.log('Message:', message);
+                console.log('Signature:', signature);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        document.getElementById('signButton').addEventListener('click', signMessage);
+
+        var sign = "0x229e08bff6d8a7ec21ea1857bbd07170b1370117a3e4962fc756e81108a63fa6497eabc0dd70c8b3dcc1f4b8581a86b45aaebfd351620698e7026b40f964542c1b";
+        async function verifySignature() {
+            try {
+                const accounts = await web3.eth.getAccounts();
+                const recoveredAddress = web3.eth.accounts.recover(message, sign);
+
+                console.log("recoveredAddress.toLowerCase()",recoveredAddress.toLowerCase())
+                console.log("accounts[0].toLowerCase(",accounts[0].toLowerCase());
+
+                if (recoveredAddress.toLowerCase() === accounts[0].toLowerCase()) {
+                    console.log('Signature is valid. Message was signed by the correct address.');
+                } else {
+                    console.log('Signature is invalid. Message was not signed by the provided address.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        document.getElementById('verify').addEventListener('click', verifySignature);
+
+        // Connect to MetaMask when the page loads
+        connectToMetaMask();
+    </script>
+</body>
+
+</html>
